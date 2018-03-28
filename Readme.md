@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Антон Девушкин](https://up.htmlacademy.ru/javascript/13/user/305929).
-* Наставник: `Неизвестно`.
+* Наставник: `Не оплачен пока`.
 
 ---
 
