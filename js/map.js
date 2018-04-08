@@ -51,5 +51,19 @@ for (var i = 0; i < 8; i++) {
 }
 
 var map = document.querySelector('.map');
+map.classList.remove('map--faded');
 
-map.classList.remove('.map--faded');
+var template = document.querySelector('template').content;
+var pinTemplate = template.querySelector('.map__pin');
+var mapPins = document.querySelector('.map__pins');
+
+var pin = pinTemplate.cloneNode(true);
+pin.querySelector('img').setAttribute('src', ads[0].autor.avatar);
+pin.style.left = ads[0].location.x + 'px';
+pin.style.top = ads[0].location.y + 'px';
+pin.querySelector('img').setAttribute('alt', 'Заголовок объявления');
+
+
+mapPins.appendChild(pin);
+
+console.log(pin.innerHTML);
