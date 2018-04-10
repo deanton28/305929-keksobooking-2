@@ -18,6 +18,75 @@ function compareRandom() {
   return Math.random() - 0.5;
 }
 
+function fillSetAttribute(el, key, attribute, content) {
+  el.querySelector(key).setAttribute(attribute, content);
+}
+
+function getDocumentFragment(list) {
+  var fragment = document.createDocumentFragment();
+
+  var pinHeight = 70;
+  var halfPinWidth = 50 / 2;
+
+  for (var m = 0; m < list.length; m++) {
+    var pin = pinTemplate.cloneNode(true);
+    var positionX = list[m].location.x - halfPinWidth + 'px';
+    var positionY = list[m].location.y - pinHeight + 'px';
+
+    pin.style.left = positionX;
+    pin.style.top = positionY;
+    fillSetAttribute(pin, 'img', 'src', list[m].autor.avatar);
+    fillSetAttribute(pin, 'img', 'alt', 'Заголовок объявления');
+
+    fragment.appendChild(pin);
+  }
+  return fragment;
+}
+
+function fillTextContent(el, key, content) {
+  el.querySelector(key).textContent = content;
+}
+
+function fillInnerHtml(el, key, content) {
+  el.querySelector(key).innerHTML = content;
+}
+
+function fillPopup(el, data) {
+  fillTextContent(article, '.popup__title', data.offer.title);
+  fillTextContent(article, '.popup__text--address', data.offer.address);
+  fillTextContent(article, '.popup__text--price', data.offer.price + ' \u20bd/ночь');
+  fillTextContent(article, '.popup__type', typesHouseRussian[data.offer.type]);
+  fillTextContent(article, '.popup__text--capacity', data.offer.rooms + ' комнаты для ' + ads[0].offer.guests + ' гостей');
+  fillTextContent(article, '.popup__text--time', 'Заезд после ' + data.offer.checkin + ', выезд до ' + ads[0].offer.checkout);
+  fillTextContent(article, '.popup__description', ads[0].offer.description);
+
+  var iconFeatures = [];
+  var images = [];
+
+  for (var f = 0; f < ads[0].offer.features.length; f++) {
+    iconFeatures.push('<li class="popup__feature popup__feature--' + ads[0].offer.features[f] + '"></li>');
+  }
+
+  for (var p = 0; p < ads[0].offer.photos.length; p++) {
+    images.push('<img src="' + ads[0].offer.photos[p] + '" class="popup__photo" width="45" height="40" alt="Фотография жилья">');
+  }
+
+  fillInnerHtml(article, '.popup__features', iconFeatures.join(''));
+  fillInnerHtml(article, '.popup__photos', images.join(''));
+}
+
+function showCard(el, data) {
+  fillSetAttribute(el, '.popup__avatar', 'src', data.autor.avatar);
+  fillPopup(el, data);
+}
+
+var typesHouseRussian = {
+  palace: 'Дворец',
+  flat: 'Квартира',
+  house: 'Дом',
+  bungalo: 'Бунгало'
+};
+
 var ads = [];
 
 for (var i = 0; i < 8; i++) {
@@ -51,19 +120,14 @@ for (var i = 0; i < 8; i++) {
 }
 
 var map = document.querySelector('.map');
-map.classList.remove('map--faded');
+var mapPins = document.querySelector('.map__pins');
 
 var template = document.querySelector('template').content;
 var pinTemplate = template.querySelector('.map__pin');
-var mapPins = document.querySelector('.map__pins');
+var articleTemplate = template.querySelector('.map__card');
+var article = articleTemplate.cloneNode(true);
 
-var pin = pinTemplate.cloneNode(true);
-pin.querySelector('img').setAttribute('src', ads[0].autor.avatar);
-pin.style.left = ads[0].location.x + 'px';
-pin.style.top = ads[0].location.y + 'px';
-pin.querySelector('img').setAttribute('alt', 'Заголовок объявления');
-
-
-mapPins.appendChild(pin);
-
-console.log(pin.innerHTML);
+map.classList.remove('map--faded');
+mapPins.appendChild(getDocumentFragment(ads));
+showCard(article, ads[0]);
+map.insertBefore(article, map.querySelector('.map__filters-container'));
