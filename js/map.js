@@ -127,7 +127,36 @@ var pinTemplate = template.querySelector('.map__pin');
 var articleTemplate = template.querySelector('.map__card');
 var article = articleTemplate.cloneNode(true);
 
-map.classList.remove('map--faded');
-mapPins.appendChild(getDocumentFragment(ads));
-showCard(article, ads[0]);
-map.insertBefore(article, map.querySelector('.map__filters-container'));
+// map.classList.remove('map--faded');
+// mapPins.appendChild(getDocumentFragment(ads));
+// showCard(article, ads[0]);
+// map.insertBefore(article, map.querySelector('.map__filters-container'));
+
+// Подробности
+
+var pinMainHeight = 84;
+var pinMainWidth = 62;
+var pinMain = document.querySelector('.map__pin--main');
+var form = document.querySelector('.ad-form');
+var fieldsForm = form.querySelectorAll('fieldset');
+var formAddress = form.querySelector('#address');
+
+fieldsForm.forEach(function (f) {
+  f.setAttribute('disabled', '');
+});
+
+var pinMainLocationX = pinMain.offsetLeft;
+var pinMainLocationY = pinMain.offsetTop;
+
+formAddress.value = (pinMainLocationX + pinMainWidth / 2) + ', ' + (pinMainLocationY + pinMainHeight / 2);
+
+console.log(pinMainLocationX + ' ' + pinMainLocationY);
+
+pinMain.addEventListener('mouseup', function () {
+  map.classList.remove('map--faded');
+  form.classList.remove('ad-form--disabled');
+
+  fieldsForm.forEach(function (f) {
+    f.removeAttribute('disabled', '');
+  });
+});
