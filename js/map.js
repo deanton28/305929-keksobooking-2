@@ -56,19 +56,19 @@ function fillPopup(el, data) {
   fillTextContent(article, '.popup__text--address', data.offer.address);
   fillTextContent(article, '.popup__text--price', data.offer.price + ' \u20bd/ночь');
   fillTextContent(article, '.popup__type', typesHouseRussian[data.offer.type]);
-  fillTextContent(article, '.popup__text--capacity', data.offer.rooms + ' комнаты для ' + ads[0].offer.guests + ' гостей');
-  fillTextContent(article, '.popup__text--time', 'Заезд после ' + data.offer.checkin + ', выезд до ' + ads[0].offer.checkout);
-  fillTextContent(article, '.popup__description', ads[0].offer.description);
+  fillTextContent(article, '.popup__text--capacity', data.offer.rooms + ' комнаты для ' + data.offer.guests + ' гостей');
+  fillTextContent(article, '.popup__text--time', 'Заезд после ' + data.offer.checkin + ', выезд до ' + data.offer.checkout);
+  fillTextContent(article, '.popup__description', data.offer.description);
 
   var iconFeatures = [];
   var images = [];
 
-  for (var f = 0; f < ads[0].offer.features.length; f++) {
-    iconFeatures.push('<li class="popup__feature popup__feature--' + ads[0].offer.features[f] + '"></li>');
+  for (var f = 0; f < data.offer.features.length; f++) {
+    iconFeatures.push('<li class="popup__feature popup__feature--' + data.offer.features[f] + '"></li>');
   }
 
-  for (var p = 0; p < ads[0].offer.photos.length; p++) {
-    images.push('<img src="' + ads[0].offer.photos[p] + '" class="popup__photo" width="45" height="40" alt="Фотография жилья">');
+  for (var p = 0; p < data.offer.photos.length; p++) {
+    images.push('<img src="' + data.offer.photos[p] + '" class="popup__photo" width="45" height="40" alt="Фотография жилья">');
   }
 
   fillInnerHtml(article, '.popup__features', iconFeatures.join(''));
@@ -127,7 +127,93 @@ var pinTemplate = template.querySelector('.map__pin');
 var articleTemplate = template.querySelector('.map__card');
 var article = articleTemplate.cloneNode(true);
 
-map.classList.remove('map--faded');
-mapPins.appendChild(getDocumentFragment(ads));
-showCard(article, ads[0]);
-map.insertBefore(article, map.querySelector('.map__filters-container'));
+map.insertBefore(article, map.querySelector('.map__filters-container')).setAttribute('hidden', '');
+
+
+// map.classList.remove('map--faded');
+// mapPins.appendChild(getDocumentFragment(ads));
+// showCard(article, ads[0]);
+
+// Подробности
+
+// Нужен ли tabindex?
+
+var ENTER = 13;
+var ESC = 27;
+
+function displayOfferDialog(data, index) {
+  return function (evt) {
+    if (evt.keyCode === ENTER || typeof evt.keyCode === 'undefined') {
+      showCard(article, ads[index]);
+      article.removeAttribute('hidden');
+    }
+  };
+}
+
+// function closeOfferDialog() {
+//   return function (evt) {
+//     if (evt.keyCode === ENTER || typeof evt.keyCode === 'undefined') {
+//       article.setAttribute('hidden', '');
+//     }
+//   };
+// }
+
+function closeOfferDialog() {
+  article.setAttribute('hidden', '');
+}
+
+var pinMainHeight = 84;
+var pinMainWidth = 62;
+var pinMain = document.querySelector('.map__pin--main');
+var form = document.querySelector('.ad-form');
+var fieldsForm = form.querySelectorAll('fieldset');
+var formAddress = form.querySelector('#address');
+var close = article.querySelector('.popup__close');
+
+// Может быть прописать это в index.html
+fieldsForm.forEach(function (f) {
+  f.setAttribute('disabled', '');
+});
+// --------------------------------------------
+
+// не забыть добавить это в адрес посде активации формы
+var pinMainLocationX = pinMain.offsetLeft;
+var pinMainLocationY = pinMain.offsetTop;
+// ---------------------------------------------
+
+formAddress.value = (pinMainLocationX + pinMainWidth / 2) + ', ' + (pinMainLocationY + pinMainHeight / 2);
+
+pinMain.addEventListener('mouseup', function () {
+  map.classList.remove('map--faded');
+  form.classList.remove('ad-form--disabled');
+
+  fieldsForm.forEach(function (f) {
+    f.removeAttribute('disabled', '');
+  });
+
+  mapPins.appendChild(getDocumentFragment(ads));
+
+  var pins = mapPins.querySelectorAll('.map__pin:not(.map__pin--main)');
+
+  pins.forEach(function (pin, index) {
+    pin.addEventListener('click', displayOfferDialog(ads, index));
+    pin.addEventListener('keydown', displayOfferDialog(ads, index));
+  });
+});
+
+// тут еще подумать
+close.addEventListener('click', function () {
+  closeOfferDialog();
+});
+close.addEventListener('keydown', function (evt) {
+  if (evt.keydown === ENTER) {
+    closeOfferDialog();
+  }
+});
+
+document.addEventListener('keydown', function (evt) {
+  if (evt.keyCode === ESC) {
+    closeOfferDialog();
+  }
+});
+// --------------------------------------------
