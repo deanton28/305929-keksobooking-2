@@ -222,30 +222,6 @@ document.addEventListener('keydown', function (evt) {
 
 // Доверяй но проверяй
 
-var variantHousePrice = {
-  'bungalo': 0,
-  'flat': 1000,
-  'house': 5000,
-  'palace': 10000
-};
-
-var guestRoomCount = {
-  '1': ['1'],
-  '2': ['1', '2'],
-  '3': ['1', '2', '3'],
-  '100': ['0']
-};
-
-var typeHouse = document.getElementById('type');
-var formPrice = document.getElementById('price');
-var timeIn = document.getElementById('timein');
-var timeOut = document.getElementById('timeout');
-var roomNumber = document.getElementById('room_number');
-var capacity = document.getElementById('capacity');
-var buttonFormSubmit = document.querySelector('.ad-form__submit');
-var buttonFormReset = document.querySelector('.ad-form__reset');
-var formTitle = document.getElementById('title');
-
 function setMinPrice(sourseElement, targetelement) {
   sourseElement.addEventListener('change', function () {
     targetelement.placeholder = variantHousePrice[sourseElement.value];
@@ -262,25 +238,57 @@ function setTimeInOut(fieldIn, fieldOut) {
   });
 }
 
-setMinPrice(typeHouse, formPrice);
+function forEach(array, collback) {
+  for (var f = 0; f < array.length; f++) {
+    collback(array[f], f);
+  }
+}
 
+function setCapacity(item) {
+  var capacityVariants = guestRoomCount[roomNumber.value];
+  var exists = capacityVariants.indexOf(item.value) < 0;
+  if (exists) {
+    item.setAttribute('hidden', '');
+  } else {
+    item.removeAttribute('hidden');
+  }
+}
+
+var formTitle = document.getElementById('title');
+var typeHouse = document.getElementById('type');
+var formPrice = document.getElementById('price');
+var timeIn = document.getElementById('timein');
+var timeOut = document.getElementById('timeout');
+var roomNumber = document.getElementById('room_number');
+var capacity = document.getElementById('capacity');
+var buttonFormSubmit = document.querySelector('.ad-form__submit');
+var buttonFormReset = document.querySelector('.ad-form__reset');
+
+var variantHousePrice = {
+  'bungalo': '0',
+  'flat': '1000',
+  'house': '5000',
+  'palace': '10000'
+};
+
+var guestRoomCount = {
+  '1': ['1'],
+  '2': ['1', '2'],
+  '3': ['1', '2', '3'],
+  '100': ['0']
+};
+
+setMinPrice(typeHouse, formPrice);
 setTimeInOut(timeIn, timeOut);
 
+// Соответствие комнат и гостей-------------------------
 for (var c = 0; c < capacity.options.length; c++) {
   capacity.options[c].setAttribute('hidden', '');
 }
 capacity.options[2].removeAttribute('hidden');
 
 roomNumber.addEventListener('change', function () {
-  for (var f = 0; f < capacity.options.length; f++) {
-    var roomsCount = guestRoomCount[roomNumber.value];
-    var exists = roomsCount.indexOf(capacity.options[f].value) < 0;
-    if (exists) {
-      capacity.options[f].setAttribute('hidden', '');
-    } else {
-      capacity.options[f].removeAttribute('hidden');
-    }
-  }
+  forEach(capacity.options, setCapacity);
 
   var valueRumNumber = 2;
   if (roomNumber.value === '100') {
@@ -288,6 +296,7 @@ roomNumber.addEventListener('change', function () {
   }
   capacity.options[valueRumNumber].selected = true;
 });
+// --------------------------------------------------------
 
 buttonFormSubmit.addEventListener('click', function () {
   formTitle.classList.toggle('error_filed', !formTitle.checkValidity());
@@ -295,6 +304,8 @@ buttonFormSubmit.addEventListener('click', function () {
   formAddress.classList.toggle('error_filed', !formAddress.checkValidity());
 });
 
+// Сброс формы-------------------
+// межет быть подредактировать?
 buttonFormReset.addEventListener('click', function (evt) {
   evt.preventDefault();
   form.reset();
@@ -313,3 +324,4 @@ buttonFormReset.addEventListener('click', function (evt) {
 
   formAddress.value = (pinMainLocationX + pinMainWidth / 2) + ', ' + (pinMainLocationY + pinMainHeight / 2);
 });
+// ---------------------------------------------------------------------
