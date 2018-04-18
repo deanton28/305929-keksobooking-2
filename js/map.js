@@ -166,6 +166,9 @@ function closeOfferDialog() {
 
 var pinMainHeight = 84;
 var pinMainWidth = 62;
+var pinMainHalfWidth = pinMainWidth / 2;
+var pinMainHalfHeight = pinMainHeight / 2;
+
 var pinMain = document.querySelector('.map__pin--main');
 var form = document.querySelector('.ad-form');
 var fieldsForm = form.querySelectorAll('fieldset');
@@ -183,8 +186,9 @@ var pinMainLocationX = pinMain.offsetLeft;
 var pinMainLocationY = pinMain.offsetTop;
 // ---------------------------------------------
 
-formAddress.value = (pinMainLocationX + pinMainWidth / 2) + ', ' + (pinMainLocationY + pinMainHeight / 2);
+formAddress.value = (pinMainLocationX + pinMainHalfWidth) + ', ' + (pinMainLocationY + pinMainHalfHeight);
 
+// Может быть добавить это в mousedown? ----------------------------
 pinMain.addEventListener('mouseup', function () {
   map.classList.remove('map--faded');
   form.classList.remove('ad-form--disabled');
@@ -201,6 +205,8 @@ pinMain.addEventListener('mouseup', function () {
     pin.addEventListener('click', displayOfferDialog(ads, index));
     pin.addEventListener('keydown', displayOfferDialog(ads, index));
   });
+
+  formAddress.value = (pinMainLocationX + pinMainHalfWidth) + ', ' + (pinMainLocationY + pinMainHeight);
 });
 
 // тут еще подумать
@@ -322,6 +328,65 @@ buttonFormReset.addEventListener('click', function (evt) {
 
   pinMain.setAttribute('style', 'left: 570px; top: 375px;');
 
-  formAddress.value = (pinMainLocationX + pinMainWidth / 2) + ', ' + (pinMainLocationY + pinMainHeight / 2);
+  formAddress.value = (pinMainLocationX + pinMainHalfWidth) + ', ' + (pinMainLocationY + pinMainHalfHeight);
 });
 // ---------------------------------------------------------------------
+
+// Максимум подвижности
+
+var tokyoBorderTop = 150;
+var tokyoBorderBottom = 500;
+var tokyoBorderLeft = 0;
+var tokyoBorderRigth = 1200;
+
+pinMain.addEventListener('mousedown', function (evt) {
+  evt.preventDefault();
+
+  function onMouseMove(moveEvt) {
+    moveEvt.preventDefault();
+
+    // Ограничитель по краям -------------------------------------
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+    // -----------------------------------------------------------
+
+    // Определяем смещение ------------------------------------------
+    var shift = {
+      x: startCoords.x - moveEvt.clientX,
+      y: startCoords.y - moveEvt.clientY
+    };
+
+    var pinDragLeft = pinMain.offsetLeft - shift.x;
+    var pinDragTop = pinMain.offsetTop - shift.y;
+
+    startCoords = {
+      x: moveEvt.clientX,
+      y: moveEvt.clientY
+    };
+
+    pinDragTop = clamp(pinDragTop, tokyoBorderTop - pinMainHeight, tokyoBorderBottom - pinMainHeight);
+    pinDragLeft = clamp(pinDragLeft, tokyoBorderLeft, tokyoBorderRigth - pinMainWidth);
+
+    pinMain.style.top = (pinDragTop) + 'px';
+    pinMain.style.left = (pinDragLeft) + 'px';
+    // ---------------------------------------------------------------------------
+
+    formAddress.value = (pinDragLeft + pinMainHalfWidth) + ', ' + (pinDragTop + pinMainHeight);
+  }
+
+  function onMouseUp(upEvt) {
+    upEvt.preventDefault();
+
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+  }
+
+  var startCoords = {
+    x: evt.clientX,
+    y: evt.clientY
+  };
+
+  document.addEventListener('mousemove', onMouseMove);
+  document.addEventListener('mouseup', onMouseUp);
+});
