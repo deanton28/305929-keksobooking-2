@@ -21,6 +21,13 @@ window.data = {};
     return Math.random() - 0.5;
   }
 
+  var typesHouseRussian = {
+    palace: 'Дворец',
+    flat: 'Квартира',
+    house: 'Дом',
+    bungalo: 'Бунгало'
+  };
+
   exports.ads = [];
 
   for (var i = 0; i < 8; i++) {
@@ -37,7 +44,7 @@ window.data = {};
         title: TITLES[i],
         address: [locationX, locationY].join(', '),
         price: getRandomNumber(1000, 1000000),
-        type: getRandomItem(TYPES_HOUSE),
+        type: typesHouseRussian[getRandomItem(TYPES_HOUSE)],
         rooms: room,
         guests: getRandomNumber(room, room * 2),
         checkin: getRandomItem(TIMES),

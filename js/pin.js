@@ -3,25 +3,21 @@
 window.pin = {};
 
 (function (exports) {
-  exports.fillSetAttribute = function (el, key, attribute, content) {
-    el.querySelector(key).setAttribute(attribute, content);
-  };
-
   function getDocumentFragment(list) {
     var fragment = document.createDocumentFragment();
 
     var pinHeight = 70;
     var halfPinWidth = 50 / 2;
 
-    for (var m = 0; m < list.length; m++) {
+    for (var i = 0; i < list.length; i++) {
       var pin = pinTemplate.cloneNode(true);
-      var positionX = list[m].location.x - halfPinWidth + 'px';
-      var positionY = list[m].location.y - pinHeight + 'px';
+      var positionX = list[i].location.x - halfPinWidth + 'px';
+      var positionY = list[i].location.y - pinHeight + 'px';
 
       pin.style.left = positionX;
       pin.style.top = positionY;
-      exports.fillSetAttribute(pin, 'img', 'src', list[m].autor.avatar);
-      exports.fillSetAttribute(pin, 'img', 'alt', 'Заголовок объявления');
+      window.utils.fillSetAttribute(pin, 'img', 'src', list[i].autor.avatar);
+      window.utils.fillSetAttribute(pin, 'img', 'alt', 'Заголовок объявления');
 
       fragment.appendChild(pin);
     }
