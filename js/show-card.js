@@ -3,7 +3,7 @@ window.show = {};
 
 (function (exports) {
   function fillPopup(el, data) {
-    window.utils.fillSetAttribute(el, '.popup__avatar', 'src', data.autor.avatar);
+    window.utils.fillSetAttribute(el, '.popup__avatar', 'src', data.author.avatar);
     window.utils.fillTextContent(el, '.popup__title', data.offer.title);
     window.utils.fillTextContent(el, '.popup__text--address', data.offer.address);
     window.utils.fillTextContent(el, '.popup__text--price', data.offer.price + ' \u20bd/ночь');

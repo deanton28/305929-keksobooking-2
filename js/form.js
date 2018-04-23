@@ -29,6 +29,24 @@ window.form = {};
     }
   }
 
+  function resetForm() {
+    exports.form.reset();
+    window.map.map.classList.add('map--faded');
+    exports.form.classList.add('ad-form--disabled');
+
+    window.pin.mapPins.querySelectorAll('.map__pin:not(.map__pin--main)').forEach(function (pin) {
+      pin.remove();
+    });
+
+    if (window.card.article) {
+      window.card.article.remove();
+    }
+
+    window.map.pinMain.setAttribute('style', 'left: 570px; top: 375px;');
+
+    exports.formAddress.value = (window.map.pinMainLocationX + window.map.pinMainHalfWidth) + ', ' + (window.map.pinMainLocationY + window.map.pinMainHalfHeight);
+  }
+
   var formTitle = document.getElementById('title');
   var typeHouse = document.getElementById('type');
   var formPrice = document.getElementById('price');
@@ -94,20 +112,33 @@ window.form = {};
   // межет быть подредактировать?
   buttonFormReset.addEventListener('click', function (evt) {
     evt.preventDefault();
-    exports.form.reset();
-    window.map.map.classList.add('map--faded');
-    exports.form.classList.add('ad-form--disabled');
-    var pins = window.pin.mapPins.querySelectorAll('.map__pin:not(.map__pin--main)');
-    pins.forEach(function (pin) {
-      window.pin.mapPins.removeChild(pin);
+    resetForm();
+  });
+
+  // Загрузка данных -----------------------------------------------------
+  function onLoad() {
+    var messageSuccess = document.querySelector('.success');
+
+    resetForm();
+
+    messageSuccess.classList.remove('hidden');
+    document.addEventListener('click', function () {
+      messageSuccess.classList.add('hidden');
     });
+  }
 
-    if (window.map.map.querySelector('article')) {
-      exports.map.removeChild(window.card.article);
-    }
+  exports.onError = function (data) {
+    var messageError = document.createElement('div');
+    messageError.classList = 'message';
+    messageError.innerHTML = '<p>' + data + '</p>';
+    exports.form.appendChild(messageError);
+    document.addEventListener('click', function () {
+      messageError.remove();
+    });
+  };
 
-    window.map.pinMain.setAttribute('style', 'left: 570px; top: 375px;');
-
-    exports.formAddress.value = (window.pin.pinMainLocationX + window.pin.pinMainHalfWidth) + ', ' + (window.pin.pinMainLocationY + window.pin.pinMainHalfHeight);
+  exports.form.addEventListener('submit', function (evt) {
+    window.backend.save(new FormData(exports.form), onLoad, exports.onError);
+    evt.preventDefault();
   });
 })(window.form);

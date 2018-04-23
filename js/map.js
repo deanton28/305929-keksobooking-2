@@ -7,8 +7,10 @@ window.map = {};
   // Нужен ли tabindex?
   var pinMainHeight = 84;
   var pinMainWidth = 62;
-  var pinMainHalfWidth = pinMainWidth / 2;
-  var pinMainHalfHeight = pinMainHeight / 2;
+
+  exports.pinMainHalfWidth = pinMainWidth / 2;
+  exports.pinMainHalfHeight = pinMainHeight / 2;
+
   var close = window.card.article.querySelector('.popup__close');
 
 
@@ -18,7 +20,8 @@ window.map = {};
   exports.pinMainLocationX = exports.pinMain.offsetLeft;
   exports.pinMainLocationY = exports.pinMain.offsetTop;
 
-  window.form.formAddress.value = (exports.pinMainLocationX + pinMainHalfWidth) + ', ' + (exports.pinMainLocationY + pinMainHalfHeight);
+  // может это в index прописать? ---------------------------------------
+  window.form.formAddress.value = (exports.pinMainLocationX + exports.pinMainHalfWidth) + ', ' + (exports.pinMainLocationY + exports.pinMainHalfHeight);
 
   // Может быть добавить это в mousedown? ----------------------------
   exports.pinMain.addEventListener('mouseup', function () {
@@ -30,14 +33,10 @@ window.map = {};
         field.removeAttribute('disabled', '');
       });
 
-      window.pin.getPins(window.data.ads);
+      // window.pin.getPins(window.data.ads);
+      window.backend.load(window.pin.onLoad, window.form.onError);
 
-      window.pin.pins.forEach(function (pin, index) {
-        pin.addEventListener('click', window.card.displayOfferDialog(window.data.ads, index));
-        pin.addEventListener('keydown', window.card.displayOfferDialog(window.data.ads, index));
-      });
-
-      window.form.formAddress.value = (exports.pinMainLocationX + pinMainHalfWidth) + ', ' + (exports.pinMainLocationY + pinMainHeight);
+      window.form.formAddress.value = (exports.pinMainLocationX + exports.pinMainHalfWidth) + ', ' + (exports.pinMainLocationY + pinMainHeight);
     }
   });
 
@@ -97,7 +96,7 @@ window.map = {};
       exports.pinMain.style.left = (pinDragLeft) + 'px';
       // -------------------------------------------------------------------
 
-      window.form.formAddress.value = (pinDragLeft + pinMainHalfWidth) + ', ' + (pinDragTop + pinMainHeight);
+      window.form.formAddress.value = (pinDragLeft + exports.pinMainHalfWidth) + ', ' + (pinDragTop + pinMainHeight);
     }
 
     function onMouseUp(upEvt) {

@@ -6,7 +6,7 @@ window.card = {};
   exports.displayOfferDialog = function (data, index) {
     return function (evt) {
       if (evt.keyCode === window.utils.ENTER || typeof evt.keyCode === 'undefined') {
-        window.show.showCard(exports.article, window.data.ads[index]);
+        window.show.showCard(exports.article, data[index]);
         window.map.map.insertBefore(exports.article, window.map.map.querySelector('.map__filters-container'));
       }
     };
