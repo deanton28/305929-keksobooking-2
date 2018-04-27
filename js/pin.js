@@ -3,30 +3,34 @@
 window.pin = {};
 
 (function (exports) {
-  function getDocumentFragment(list) {
+  function getDocumentFragment(data) {
     var fragment = document.createDocumentFragment();
 
     var pinHeight = 70;
     var halfPinWidth = 50 / 2;
 
-    for (var i = 0; i < list.length; i++) {
+    for (var i = 0; i < data.length; i++) {
       var pin = pinTemplate.cloneNode(true);
-      var positionX = list[i].location.x - halfPinWidth + 'px';
-      var positionY = list[i].location.y - pinHeight + 'px';
+      var positionX = data[i].location.x - halfPinWidth + 'px';
+      var positionY = data[i].location.y - pinHeight + 'px';
 
       pin.style.left = positionX;
       pin.style.top = positionY;
-      window.utils.fillSetAttribute(pin, 'img', 'src', list[i].autor.avatar);
+      window.utils.fillSetAttribute(pin, 'img', 'src', data[i].author.avatar);
       window.utils.fillSetAttribute(pin, 'img', 'alt', 'Заголовок объявления');
 
       fragment.appendChild(pin);
     }
     return fragment;
   }
-  exports.getPins = function (list) {
-    exports.mapPins.appendChild(getDocumentFragment(list));
+
+  exports.onLoad = function (data) {
+    exports.mapPins.appendChild(getDocumentFragment(data));
     exports.pins = exports.mapPins.querySelectorAll('.map__pin:not(.map__pin--main)');
-    return exports.pins;
+    exports.pins.forEach(function (pin, index) {
+      pin.addEventListener('click', window.card.displayOfferDialog(data, index));
+      pin.addEventListener('keydown', window.card.displayOfferDialog(data, index));
+    });
   };
 
   exports.mapPins = document.querySelector('.map__pins');
