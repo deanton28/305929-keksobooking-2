@@ -9,7 +9,7 @@ window.pin = {};
     var pinHeight = 70;
     var halfPinWidth = 50 / 2;
 
-    for (var i = 0; i < data.length; i++) {
+    for (var i = 0; i < data.length && i <= 4; i++) {
       var pin = pinTemplate.cloneNode(true);
       var positionX = data[i].location.x - halfPinWidth + 'px';
       var positionY = data[i].location.y - pinHeight + 'px';
@@ -25,11 +25,16 @@ window.pin = {};
   }
 
   exports.onLoad = function (data) {
-    exports.mapPins.appendChild(getDocumentFragment(data));
+    window.filter.ads = data;
+    exports.renderPin(window.filter.ads);
+  };
+
+  exports.renderPin = function (data) {
+    exports.mapPins.appendChild(getDocumentFragment(window.filter.getFilteredData(data)));
     exports.pins = exports.mapPins.querySelectorAll('.map__pin:not(.map__pin--main)');
     exports.pins.forEach(function (pin, index) {
-      pin.addEventListener('click', window.card.displayOfferDialog(data, index));
-      pin.addEventListener('keydown', window.card.displayOfferDialog(data, index));
+      pin.addEventListener('click', window.card.displayOfferDialog(window.filter.getFilteredData(data), index));
+      pin.addEventListener('keydown', window.card.displayOfferDialog(window.filter.getFilteredData(data), index));
     });
   };
 

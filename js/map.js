@@ -16,6 +16,7 @@ window.map = {};
 
   exports.map = document.querySelector('.map');
   exports.pinMain = document.querySelector('.map__pin--main');
+  exports.filterArea = document.querySelector('.map__filters');
 
   exports.pinMainLocationX = exports.pinMain.offsetLeft;
   exports.pinMainLocationY = exports.pinMain.offsetTop;
@@ -33,7 +34,6 @@ window.map = {};
         field.removeAttribute('disabled', '');
       });
 
-      // window.pin.getPins(window.data.ads);
       window.backend.load(window.pin.onLoad, window.form.onError);
 
       window.form.formAddress.value = (exports.pinMainLocationX + exports.pinMainHalfWidth) + ', ' + (exports.pinMainLocationY + pinMainHeight);

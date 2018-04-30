@@ -29,11 +29,7 @@ window.form = {};
     }
   }
 
-  function resetForm() {
-    exports.form.reset();
-    window.map.map.classList.add('map--faded');
-    exports.form.classList.add('ad-form--disabled');
-
+  exports.removePinCard = function () {
     window.pin.mapPins.querySelectorAll('.map__pin:not(.map__pin--main)').forEach(function (pin) {
       pin.remove();
     });
@@ -41,6 +37,22 @@ window.form = {};
     if (window.card.article) {
       window.card.article.remove();
     }
+  };
+
+  function resetForm() {
+    exports.form.reset();
+    window.map.filterArea.reset();
+    window.map.map.classList.add('map--faded');
+    exports.form.classList.add('ad-form--disabled');
+    exports.fieldsForm.forEach(function (f) {
+      f.setAttribute('disabled', '');
+    });
+
+    window.filter.filters = {
+      features: []
+    };
+
+    exports.removePinCard();
 
     window.map.pinMain.setAttribute('style', 'left: 570px; top: 375px;');
 

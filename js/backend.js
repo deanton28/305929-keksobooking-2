@@ -28,7 +28,6 @@ window.backend = {};
     xhr.responseType = 'json';
 
     xhr.addEventListener('load', function () {
-      // console.log('status ' + xhr.status);
       if (xhr.status < 300) {
         onLoad();
       } else {

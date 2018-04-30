@@ -6,6 +6,16 @@ window.utils = {};
   exports.ENTER = 13;
   exports.ESC = 27;
 
+  var lastTimeout;
+
+  exports.debounce = function (func, interval) {
+    if (lastTimeout) {
+      window.clearTimeout(lastTimeout);
+      lastTimeout = null;
+    }
+    lastTimeout = window.setTimeout(func, interval);
+  };
+
   exports.fillTextContent = function (el, key, content) {
     el.querySelector(key).textContent = content;
   };

@@ -1,104 +1,92 @@
 'use strict';
+window.filter = {};
 
-// console.log(window.data.ads);
+(function (exports) {
+  exports.ads = {};
+  exports.filters = {
+    features: []
+  };
 
-// for (var i = 0; i < window.data.ads.length; i++) {
-// //   console.log(`${window.data.ads[i].offer.rooms} / ${window.data.ads[i].offer.type} / ${window.data.ads[i].offer.guests} / ${window.data.ads[i].offer.features} / ${window.data.ads[i].offer.price}`);
-// // }
-
-var filters = {
-  price: [10000, 50000],
-  // type: 'bungalo',
-  // rooms: '',
-  // guests: '',
-  features: []
-};
-
-var variantsPrice = {
-  middle: [10000, 50000],
-  low: [0, 9999],
-  high: [50001, 1000000]
-};
-
-function arrFiltered(arr1, arr2, key) {
-  // поставить это как условие на самый верх.
-  if (key !== 'price' && key !== 'features') {
-    // console.log(`${arr1[key]} / ${arr2[key]}`)
-    // console.log(arr1[key] !== arr2[key])
-    if (arr1[key] !== arr2[key]) {
-      return false;
-    }
-  }
-
-  // if key === features ....   if key === price .... сделать так.
-  if (key === 'features') {
-    // console.log(`${arr1[key]} / ${arr2[key]}`)
-    // console.log(arr1[key] === arr2[key])
-    for (var i = 0; i < arr2[key].length; i++) {
-      if (arr1[key].indexOf(arr2[key][i]) === -1) {
+  function getFilter(sourseData, filterData, key) {
+    if (key === 'rooms' || key === 'guests') {
+      if (sourseData[key] !== +filterData[key]) {
         return false;
       }
     }
-    // return true;
-  }
 
-  if (key === 'price') {
-    // console.log(`${arr2[key][0]} / ${arr2[key][1]} / ${arr1[key]}`)
-    // console.log(arr2[key][0] <= arr1[key] && arr2[key][1] >= arr1[key]);
-    if (arr2[key][0] <= arr1[key] && arr2[key][1] >= arr1[key]) {
-      return true;
-    } else {
-      return false;
+    if (key === 'type') {
+      if (sourseData[key] !== filterData[key]) {
+        return false;
+      }
     }
+
+    if (key === 'features') {
+      for (var i = 0; i < filterData[key].length; i++) {
+        if (sourseData[key].indexOf(filterData[key][i]) === -1) {
+          return false;
+        }
+      }
+    }
+
+    if (key === 'price') {
+      var variantsPrice = {
+        middle: [10000, 50000],
+        low: [0, 9999],
+        high: [50001, 100000000]
+      };
+
+      if (filterData[key] === 'any') {
+        return true;
+      }
+
+      if (variantsPrice[filterData[key]][0] <= sourseData[key] && variantsPrice[filterData[key]][1] >= sourseData[key]) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    return true;
   }
 
-  return true;
-}
+  exports.getFilteredData = function (data) {
+    var filteredAds = data.filter(function (ad) {
+      return Object.keys(exports.filters).every(function (key) {
+        return !exports.filters[key] || getFilter(ad.offer, exports.filters, key);
+      });
+    });
+    return filteredAds;
+  };
 
-var filterHouseType = document.getElementById('housing-type');
-var filterHousePrice = document.getElementById('housing-price');
-var filterHouseRooms = document.getElementById('housing-rooms');
-
-filterHouseType.addEventListener('change', function () {
-  // console.log(filterHouseType.value);
-  if (filterHouseType.value !== 'any') {
-    filters.type = filterHouseType.value;
-  } else {
-    delete filters.type;
+  function displayFilteredPins() {
+    window.form.removePinCard();
+    window.pin.renderPin(exports.getFilteredData(exports.ads));
   }
-  // console.log(filters.type);
-  // console.log(filters);
-});
 
-filterHousePrice.addEventListener('change', function () {
-  // console.log(filterHousePrice.value);
-  if (filterHousePrice.value !== 'any') {
-    filters.price = variantsPrice[filterHousePrice.value];
-  } else {
-    delete filters.price;
-  }
-  // console.log(filters.price);
-  // console.log(filters);
-});
+  var filterFields = document.querySelectorAll('.map__filters select');
+  var filterFeature = document.querySelectorAll('#housing-features input');
 
-filterHouseRooms.addEventListener('change', function () {
-  // console.log(filterHouseRooms.value);
-  if (filterHouseRooms.value !== 'any') {
-    filters.rooms = filterHouseRooms.value;
-  } else {
-    delete filters.rooms;
-  }
-  // console.log(filters.rooms);
-  // console.log(filters);
-});
+  filterFields.forEach(function (field) {
+    field.addEventListener('change', function () {
+      if (field.value !== 'any') {
+        exports.filters[field.id.split('-').slice(-1)] = field.value;
+      } else {
+        delete exports.filters[field.id.split('-').slice(-1)];
+      }
 
-var filteredAds = window.data.ads.filter(function (ad) {
-  // console.log(`фильтр = ${filters.rooms} / ${filters.type} / ${filters.guests} / ${filters.features} / ${filters.price}`);
-  return Object.keys(filters).every(function (key) {
-    // console.log(`${filters[key]}  / ${ad.offer[key]}`)
-    // console.log(filters[key] === ad.offer[key]);
-    return !filters[key] || arrFiltered(ad.offer, filters, key);
+      window.utils.debounce(displayFilteredPins, 500);
+    });
   });
-});
 
-// console.log(filteredAds);
+  filterFeature.forEach(function (feature) {
+    feature.addEventListener('change', function () {
+      if (feature.checked) {
+        exports.filters.features.push(feature.value);
+      } else {
+        exports.filters.features.splice(exports.filters.features.indexOf(feature.value), 1);
+      }
+
+      window.utils.debounce(displayFilteredPins, 500);
+    });
+  });
+})(window.filter);
