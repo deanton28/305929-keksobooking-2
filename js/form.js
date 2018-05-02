@@ -29,11 +29,7 @@ window.form = {};
     }
   }
 
-  function resetForm() {
-    exports.form.reset();
-    window.map.map.classList.add('map--faded');
-    exports.form.classList.add('ad-form--disabled');
-
+  exports.removePinCard = function () {
     window.pin.mapPins.querySelectorAll('.map__pin:not(.map__pin--main)').forEach(function (pin) {
       pin.remove();
     });
@@ -41,19 +37,54 @@ window.form = {};
     if (window.card.article) {
       window.card.article.remove();
     }
+  };
+
+  function resetForm() {
+    exports.form.reset();
+    window.map.filterArea.reset();
+    window.map.map.classList.add('map--faded');
+    exports.form.classList.add('ad-form--disabled');
+    exports.fieldsForm.forEach(function (f) {
+      f.setAttribute('disabled', '');
+    });
+
+    window.filter.filters = {
+      features: []
+    };
+
+    exports.removePinCard();
 
     window.map.pinMain.setAttribute('style', 'left: 570px; top: 375px;');
-
-    exports.formAddress.value = (window.map.pinMainLocationX + window.map.pinMainHalfWidth) + ', ' + (window.map.pinMainLocationY + window.map.pinMainHalfHeight);
   }
 
-  var formTitle = document.getElementById('title');
-  var typeHouse = document.getElementById('type');
-  var formPrice = document.getElementById('price');
-  var timeIn = document.getElementById('timein');
-  var timeOut = document.getElementById('timeout');
-  var roomNumber = document.getElementById('room_number');
-  var capacity = document.getElementById('capacity');
+  function onLoad() {
+    var messageSuccess = document.querySelector('.success');
+
+    resetForm();
+
+    messageSuccess.classList.remove('hidden');
+    document.addEventListener('click', function () {
+      messageSuccess.classList.add('hidden');
+    });
+  }
+
+  exports.onError = function (data) {
+    var messageError = document.createElement('div');
+    messageError.classList = 'message';
+    messageError.innerHTML = '<p>' + data + '</p>';
+    exports.form.appendChild(messageError);
+    document.addEventListener('click', function () {
+      messageError.remove();
+    });
+  };
+
+  var formTitle = document.querySelector('#title');
+  var typeHouse = document.querySelector('#type');
+  var formPrice = document.querySelector('#price');
+  var timeIn = document.querySelector('#timein');
+  var timeOut = document.querySelector('#timeout');
+  var roomNumber = document.querySelector('#room_number');
+  var capacity = document.querySelector('#capacity');
   var buttonFormSubmit = document.querySelector('.ad-form__submit');
   var buttonFormReset = document.querySelector('.ad-form__reset');
 
@@ -76,16 +107,9 @@ window.form = {};
     '100': ['0']
   };
 
-  // Может быть прописать это в index.html
-  exports.fieldsForm.forEach(function (f) {
-    f.setAttribute('disabled', '');
-  });
-  // --------------------------------------------
-
   setMinPrice(typeHouse, formPrice);
   setTimeInOut(timeIn, timeOut);
 
-  // Соответствие комнат и гостей-------------------------
   for (var c = 0; c < capacity.options.length; c++) {
     capacity.options[c].setAttribute('hidden', '');
   }
@@ -100,7 +124,6 @@ window.form = {};
     }
     capacity.options[valueRumNumber].selected = true;
   });
-  // --------------------------------------------------------
 
   buttonFormSubmit.addEventListener('click', function () {
     formTitle.classList.toggle('error_filed', !formTitle.checkValidity());
@@ -108,34 +131,10 @@ window.form = {};
     exports.formAddress.classList.toggle('error_filed', !exports.formAddress.checkValidity());
   });
 
-  // Сброс формы-------------------
-  // межет быть подредактировать?
   buttonFormReset.addEventListener('click', function (evt) {
     evt.preventDefault();
     resetForm();
   });
-
-  // Загрузка данных -----------------------------------------------------
-  function onLoad() {
-    var messageSuccess = document.querySelector('.success');
-
-    resetForm();
-
-    messageSuccess.classList.remove('hidden');
-    document.addEventListener('click', function () {
-      messageSuccess.classList.add('hidden');
-    });
-  }
-
-  exports.onError = function (data) {
-    var messageError = document.createElement('div');
-    messageError.classList = 'message';
-    messageError.innerHTML = '<p>' + data + '</p>';
-    exports.form.appendChild(messageError);
-    document.addEventListener('click', function () {
-      messageError.remove();
-    });
-  };
 
   exports.form.addEventListener('submit', function (evt) {
     window.backend.save(new FormData(exports.form), onLoad, exports.onError);

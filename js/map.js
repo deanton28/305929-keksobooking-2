@@ -3,27 +3,25 @@
 window.map = {};
 
 (function (exports) {
-  // Подробности
-  // Нужен ли tabindex?
-  var pinMainHeight = 84;
-  var pinMainWidth = 62;
+  var PIN_MAIN_HEIGHT = 84;
+  var PIN_MAIN_WIDTH = 62;
+  var TOKYO_BORDER_TOP = 150;
+  var TOKYO_BORDER_BOTTOM = 500;
+  var TOKYO_BORDER_LEFT = 0;
+  var TOKYO_BORDER_RIGHT = 1200;
 
-  exports.pinMainHalfWidth = pinMainWidth / 2;
-  exports.pinMainHalfHeight = pinMainHeight / 2;
+  exports.pinMainHalfWidth = PIN_MAIN_WIDTH / 2;
+  exports.pinMainHalfHeight = PIN_MAIN_HEIGHT / 2;
 
   var close = window.card.article.querySelector('.popup__close');
 
-
   exports.map = document.querySelector('.map');
   exports.pinMain = document.querySelector('.map__pin--main');
+  exports.filterArea = document.querySelector('.map__filters');
 
   exports.pinMainLocationX = exports.pinMain.offsetLeft;
   exports.pinMainLocationY = exports.pinMain.offsetTop;
 
-  // может это в index прописать? ---------------------------------------
-  window.form.formAddress.value = (exports.pinMainLocationX + exports.pinMainHalfWidth) + ', ' + (exports.pinMainLocationY + exports.pinMainHalfHeight);
-
-  // Может быть добавить это в mousedown? ----------------------------
   exports.pinMain.addEventListener('mouseup', function () {
     if (exports.map.className !== 'map') {
       exports.map.classList.remove('map--faded');
@@ -33,14 +31,12 @@ window.map = {};
         field.removeAttribute('disabled', '');
       });
 
-      // window.pin.getPins(window.data.ads);
       window.backend.load(window.pin.onLoad, window.form.onError);
 
-      window.form.formAddress.value = (exports.pinMainLocationX + exports.pinMainHalfWidth) + ', ' + (exports.pinMainLocationY + pinMainHeight);
+      window.form.formAddress.value = (exports.pinMainLocationX + exports.pinMainHalfWidth) + ', ' + (exports.pinMainLocationY + PIN_MAIN_HEIGHT);
     }
   });
 
-  // тут еще подумать
   close.addEventListener('click', function () {
     window.card.closeOfferDialog();
   });
@@ -55,13 +51,6 @@ window.map = {};
       window.card.closeOfferDialog();
     }
   });
-  // --------------------------------------------
-
-  // Максимум подвижности
-  var tokyoBorderTop = 150;
-  var tokyoBorderBottom = 500;
-  var tokyoBorderLeft = 0;
-  var tokyoBorderRigth = 1200;
 
   exports.pinMain.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
@@ -69,13 +58,10 @@ window.map = {};
     function onMouseMove(moveEvt) {
       moveEvt.preventDefault();
 
-      // Ограничитель по краям -------------------------------------
       function clamp(value, min, max) {
         return Math.max(min, Math.min(max, value));
       }
-      // -----------------------------------------------------------
 
-      // Определяем смещение ------------------------------------------
       var shift = {
         x: startCoords.x - moveEvt.clientX,
         y: startCoords.y - moveEvt.clientY
@@ -89,14 +75,13 @@ window.map = {};
         y: moveEvt.clientY
       };
 
-      pinDragTop = clamp(pinDragTop, tokyoBorderTop - pinMainHeight, tokyoBorderBottom - pinMainHeight);
-      pinDragLeft = clamp(pinDragLeft, tokyoBorderLeft, tokyoBorderRigth - pinMainWidth);
+      pinDragTop = clamp(pinDragTop, TOKYO_BORDER_TOP - PIN_MAIN_HEIGHT, TOKYO_BORDER_BOTTOM - PIN_MAIN_HEIGHT);
+      pinDragLeft = clamp(pinDragLeft, TOKYO_BORDER_LEFT, TOKYO_BORDER_RIGHT - PIN_MAIN_WIDTH);
 
       exports.pinMain.style.top = (pinDragTop) + 'px';
       exports.pinMain.style.left = (pinDragLeft) + 'px';
-      // -------------------------------------------------------------------
 
-      window.form.formAddress.value = (pinDragLeft + exports.pinMainHalfWidth) + ', ' + (pinDragTop + pinMainHeight);
+      window.form.formAddress.value = (pinDragLeft + exports.pinMainHalfWidth) + ', ' + (pinDragTop + PIN_MAIN_HEIGHT);
     }
 
     function onMouseUp(upEvt) {
@@ -114,5 +99,4 @@ window.map = {};
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
   });
-
 })(window.map);
