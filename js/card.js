@@ -13,7 +13,6 @@ window.card = {};
   };
 
   exports.closeOfferDialog = function () {
-    // article.setAttribute('hidden', '');
     window.map.map.removeChild(exports.article);
   };
 

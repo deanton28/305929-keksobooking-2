@@ -2,11 +2,6 @@
 window.filter = {};
 
 (function (exports) {
-  exports.ads = {};
-  exports.filters = {
-    features: []
-  };
-
   function getFilter(sourseData, filterData, key) {
     if (key === 'rooms' || key === 'guests') {
       if (sourseData[key] !== +filterData[key]) {
@@ -51,8 +46,8 @@ window.filter = {};
 
   exports.getFilteredData = function (data) {
     var filteredAds = data.filter(function (ad) {
-      return Object.keys(exports.filters).every(function (key) {
-        return !exports.filters[key] || getFilter(ad.offer, exports.filters, key);
+      return Object.keys(exports.filter).every(function (key) {
+        return !exports.filter[key] || getFilter(ad.offer, exports.filter, key);
       });
     });
     return filteredAds;
@@ -63,15 +58,20 @@ window.filter = {};
     window.pin.renderPin(exports.getFilteredData(exports.ads));
   }
 
+  exports.ads = {};
+  exports.filter = {
+    features: []
+  };
+
   var filterFields = document.querySelectorAll('.map__filters select');
   var filterFeature = document.querySelectorAll('#housing-features input');
 
   filterFields.forEach(function (field) {
     field.addEventListener('change', function () {
       if (field.value !== 'any') {
-        exports.filters[field.id.split('-').slice(-1)] = field.value;
+        exports.filter[field.id.split('-').slice(-1)] = field.value;
       } else {
-        delete exports.filters[field.id.split('-').slice(-1)];
+        delete exports.filter[field.id.split('-').slice(-1)];
       }
 
       window.utils.debounce(displayFilteredPins, 500);
@@ -81,9 +81,9 @@ window.filter = {};
   filterFeature.forEach(function (feature) {
     feature.addEventListener('change', function () {
       if (feature.checked) {
-        exports.filters.features.push(feature.value);
+        exports.filter.features.push(feature.value);
       } else {
-        exports.filters.features.splice(exports.filters.features.indexOf(feature.value), 1);
+        exports.filter.features.splice(exports.filter.features.indexOf(feature.value), 1);
       }
 
       window.utils.debounce(displayFilteredPins, 500);

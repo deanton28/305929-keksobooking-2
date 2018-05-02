@@ -10,7 +10,7 @@ window.show = {};
     window.utils.fillTextContent(el, '.popup__title', data.offer.title);
     window.utils.fillTextContent(el, '.popup__text--address', data.offer.address);
     window.utils.fillTextContent(el, '.popup__text--price', data.offer.price + ' \u20bd/ночь');
-    window.utils.fillTextContent(el, '.popup__type', typesHouseRussian[data.offer.type]);
+    window.utils.fillTextContent(el, '.popup__type', typeHouseRussian[data.offer.type]);
     window.utils.fillTextContent(el, '.popup__text--capacity', data.offer.rooms + ' комнаты для ' + data.offer.guests + ' гостей');
     window.utils.fillTextContent(el, '.popup__text--time', 'Заезд после ' + data.offer.checkin + ', выезд до ' + data.offer.checkout);
     window.utils.fillTextContent(el, '.popup__description', data.offer.description);
@@ -31,7 +31,7 @@ window.show = {};
     fillPopup(el, data);
   };
 
-  var typesHouseRussian = {
+  var typeHouseRussian = {
     palace: 'Дворец',
     flat: 'Квартира',
     house: 'Дом',
