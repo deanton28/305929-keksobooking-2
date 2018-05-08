@@ -1,7 +1,6 @@
 'use strict';
-window.filter = {};
 
-(function (exports) {
+(function () {
   function getFilter(sourseData, filterData, key) {
     if (key === 'rooms' || key === 'guests') {
       if (sourseData[key] !== +filterData[key]) {
@@ -30,48 +29,41 @@ window.filter = {};
         high: [50001, 100000000]
       };
 
-      if (filterData[key] === 'any') {
-        return true;
-      }
-
-      if (variantsPrice[filterData[key]][0] <= sourseData[key] && variantsPrice[filterData[key]][1] >= sourseData[key]) {
-        return true;
-      } else {
-        return false;
-      }
+      return variantsPrice[filterData[key]][0] <= sourseData[key] && variantsPrice[filterData[key]][1] >= sourseData[key];
     }
 
     return true;
   }
 
-  exports.getFilteredData = function (data) {
-    var filteredAds = data.filter(function (ad) {
-      return Object.keys(exports.filter).every(function (key) {
-        return !exports.filter[key] || getFilter(ad.offer, exports.filter, key);
-      });
-    });
-    return filteredAds;
-  };
-
   function displayFilteredPins() {
     window.form.removePinCard();
-    window.pin.renderPin(exports.getFilteredData(exports.ads));
+    window.pin.renderPin(window.filter.getFilteredData(window.filter.ads));
   }
-
-  exports.ads = {};
-  exports.filter = {
-    features: []
-  };
 
   var filterFields = document.querySelectorAll('.map__filters select');
   var filterFeature = document.querySelectorAll('#housing-features input');
 
+  window.filter = {
+    getFilteredData: function (data) {
+      var filteredAds = data.filter(function (ad) {
+        return Object.keys(window.filter.filter).every(function (key) {
+          return !window.filter.filter[key] || getFilter(ad.offer, window.filter.filter, key);
+        });
+      });
+      return filteredAds;
+    },
+    ads: {},
+    filter: {
+      features: []
+    }
+  };
+
   filterFields.forEach(function (field) {
     field.addEventListener('change', function () {
       if (field.value !== 'any') {
-        exports.filter[field.id.split('-').slice(-1)] = field.value;
+        window.filter.filter[field.id.split('-').slice(-1)] = field.value;
       } else {
-        delete exports.filter[field.id.split('-').slice(-1)];
+        delete window.filter.filter[field.id.split('-').slice(-1)];
       }
 
       window.utils.debounce(displayFilteredPins, 500);
@@ -81,12 +73,12 @@ window.filter = {};
   filterFeature.forEach(function (feature) {
     feature.addEventListener('change', function () {
       if (feature.checked) {
-        exports.filter.features.push(feature.value);
+        window.filter.filter.features.push(feature.value);
       } else {
-        exports.filter.features.splice(exports.filter.features.indexOf(feature.value), 1);
+        window.filter.filter.features.splice(window.filter.filter.features.indexOf(feature.value), 1);
       }
 
       window.utils.debounce(displayFilteredPins, 500);
     });
   });
-})(window.filter);
+})();

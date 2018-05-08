@@ -1,7 +1,6 @@
 'use strict';
-window.show = {};
 
-(function (exports) {
+(function () {
   function fillPopup(el, data) {
     var iconFeatures = [];
     var images = [];
@@ -10,7 +9,7 @@ window.show = {};
     window.utils.fillTextContent(el, '.popup__title', data.offer.title);
     window.utils.fillTextContent(el, '.popup__text--address', data.offer.address);
     window.utils.fillTextContent(el, '.popup__text--price', data.offer.price + ' \u20bd/ночь');
-    window.utils.fillTextContent(el, '.popup__type', typeHouseRussian[data.offer.type]);
+    window.utils.fillTextContent(el, '.popup__type', TypeHouseRussian[data.offer.type]);
     window.utils.fillTextContent(el, '.popup__text--capacity', data.offer.rooms + ' комнаты для ' + data.offer.guests + ' гостей');
     window.utils.fillTextContent(el, '.popup__text--time', 'Заезд после ' + data.offer.checkin + ', выезд до ' + data.offer.checkout);
     window.utils.fillTextContent(el, '.popup__description', data.offer.description);
@@ -27,14 +26,16 @@ window.show = {};
     window.utils.fillInnerHtml(el, '.popup__photos', images.join(''));
   }
 
-  exports.showCard = function (el, data) {
-    fillPopup(el, data);
-  };
-
-  var typeHouseRussian = {
+  var TypeHouseRussian = {
     palace: 'Дворец',
     flat: 'Квартира',
     house: 'Дом',
     bungalo: 'Бунгало'
   };
-})(window.show);
+
+  window.show = {
+    showCard: function (el, data) {
+      fillPopup(el, data);
+    }
+  };
+})();
