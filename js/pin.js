@@ -1,18 +1,16 @@
 'use strict';
 
-window.pin = {};
+(function () {
+  var PIN_HEIGHT = 70;
+  var HALF_PIN_WIDTH = 50 / 2;
 
-(function (exports) {
   function getDocumentFragment(data) {
     var fragment = document.createDocumentFragment();
 
-    var pinHeight = 70;
-    var halfPinWidth = 50 / 2;
-
     for (var i = 0; i < data.length && i <= 4; i++) {
       var pin = pinTemplate.cloneNode(true);
-      var positionX = data[i].location.x - halfPinWidth + 'px';
-      var positionY = data[i].location.y - pinHeight + 'px';
+      var positionX = data[i].location.x - HALF_PIN_WIDTH + 'px';
+      var positionY = data[i].location.y - PIN_HEIGHT + 'px';
 
       pin.style.left = positionX;
       pin.style.top = positionY;
@@ -24,21 +22,23 @@ window.pin = {};
     return fragment;
   }
 
-  exports.onLoad = function (data) {
-    window.filter.ads = data;
-    exports.renderPin(window.filter.ads);
+  window.pin = {
+    onLoad: function (data) {
+      window.filter.ads = data;
+      window.pin.renderPin(window.filter.ads);
+    },
+    renderPin: function (data) {
+      window.pin.mapPins.appendChild(getDocumentFragment(window.filter.getFilteredData(data)));
+      window.pin.pins = window.pin.mapPins.querySelectorAll('.map__pin:not(.map__pin--main)');
+      window.pin.pins.forEach(function (pin, index) {
+        pin.addEventListener('click', window.card.onPinClickOrEnterPress(window.filter.getFilteredData(data), index));
+        pin.addEventListener('keydown', window.card.onPinClickOrEnterPress(window.filter.getFilteredData(data), index));
+      });
+    },
+    mapPins: document.querySelector('.map__pins'),
+    template: document.querySelector('template').content,
   };
 
-  exports.renderPin = function (data) {
-    exports.mapPins.appendChild(getDocumentFragment(window.filter.getFilteredData(data)));
-    exports.pins = exports.mapPins.querySelectorAll('.map__pin:not(.map__pin--main)');
-    exports.pins.forEach(function (pin, index) {
-      pin.addEventListener('click', window.card.displayOfferDialog(window.filter.getFilteredData(data), index));
-      pin.addEventListener('keydown', window.card.displayOfferDialog(window.filter.getFilteredData(data), index));
-    });
-  };
+  var pinTemplate = window.pin.template.querySelector('.map__pin');
 
-  exports.mapPins = document.querySelector('.map__pins');
-  exports.template = document.querySelector('template').content;
-  var pinTemplate = exports.template.querySelector('.map__pin');
-})(window.pin);
+})();
